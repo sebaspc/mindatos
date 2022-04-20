@@ -42,6 +42,16 @@ df['RainToday'].replace(['NA'], [0], inplace=True)
 #df3 = lluviaYes.groupby(['Year','Location'])['RainToday'].count().reset_index(name='LLuviaCOUNT')
 #print(df3)
 
+
+
+    #elimino las columnas innecesarias para mi analisis
+    #df4yes.drop(['RainToday'], axis = 1, inplace=True)
+    #df4no.drop(['RainToday'], axis = 1, inplace=True)
+    
+    #yrs = np.array(df4yes['Year']).reshape((1, -1))
+    #cntidad = np.array(df4yes['Cantidad'])
+
+
 #array ciudades
 citys = list()
 indices = list()
@@ -73,14 +83,15 @@ if busqueda in cdsID:
     #separo los datos logisticamente
     df4yes = df4[df4['RainToday'] == 'Yes']
     df4no = df4[df4['RainToday'] == 'No']
-
-    # PROMEDIO SEGÚN SI LLUVIO O NO
+    
+        #elimino las columnas innecesarias para mi analisis
     var = 0
     cont = 0
     for i in df4yes.index:
         cont = cont + 1
         var = var + df4yes['Cantidad'][i]
         prom = var / cont
+        
     varno = 0
     contno = 0
     for n in df4no.index:
@@ -88,6 +99,82 @@ if busqueda in cdsID:
         varno = varno + df4no['Cantidad'][n]
         promno = varno / contno
     print(str(df4)+'\nEl promedio total de lluvia es:\t'+str(prom)+'\nEl promedio total de sin lluvia es:\t'+str(promno))
+    
+    df4yes.drop(['RainToday'], axis = 1, inplace=True)
+    df4no.drop(['RainToday'], axis = 1, inplace=True)
+    print(df4yes)
+        # Le doy valor a mi vector x e y
+    x = np.array(df4yes['Year'])
+    y = np.array(df4yes['Cantidad'])
+    
+        # cantidad de datos en x 
+    n = len(x)
+    
+    #print('aqui va n\n')
+    #print(n)
+    
+        #variables necesarios para mi ecuacion algoritmica de regresión lineal (ecuacion de la recta)
+    sumx = sum(x)
+    sumy = sum(y)
+    sumx2 = sum(x*x)
+    sumy2 = sum(y*y)
+    sumxy = sum(x*y)
+    promx = sumx/n
+    promy = sumy/n
+    
+    
+        # sacando el pendiente de la recta (b)
+    
+    
+    m = (sumx*sumy - n * sumxy) / (sumx ** 2 - n*sumx2)
+    
+    b = promy - m*promx
+    
+    #   
+    lx = list()
+    ly = list()
+    for i in df4yes['Year']:
+        lx.append(i)
+        
+    for c in df4yes['Cantidad']:
+        ly.append(c)
+        
+        # Imprimo un ejemplo de pronostico 2018-2019
+        
+    anios = [2018, 2019]
+    
+    for i in anios:
+        if i not in lx:
+            pred = int((m*i)+b)
+            lx.append(i)
+            ly.append(pred)
+        else:
+            print('Item ya agregado')
+    print(lx)
+    print(ly)
+    lx = np.array(lx)
+    ly = np.array(ly)
+    
+    print('el valor de m es: '+str(m))
+    print('el valor de b es: '+str(b))
+    print(x.shape)
+    print(y.shape)
+
+    plt.plot(lx,ly, 'o', label= 'Datos')
+    plt.plot(lx, m*lx +b, label='Ajuste')
+    plt.scatter(lx,ly)
+    plt.title('Cantidad de veces que ha llovido por año en: '+found)
+    plt.xlabel('Años')
+    plt.ylabel('Cantidad ')
+    plt.grid()
+    plt.legend(loc=4)
+    plt.show()
+    
+
+
+    
+    # PROMEDIO SEGÚN SI LLUVIO O NO
+
 
 
 
@@ -142,7 +229,7 @@ ID\t Ciudad""")
 #for i in range(cds)
 
 # ciudad adelaide
-local = df[df['Location'] == 'Adelaide']
+#local = df[df['Location'] == 'Adelaide']
 
 # cantidad de veces y las que no ha llovido en adelaide según groupby de años y lluvia (yes or no)
 #df4 = local.groupby(['Year', 'RainToday'])['RainToday'].count().reset_index(name='Cantidad')#.sort_values(by='Cantidad', ascending=False)
