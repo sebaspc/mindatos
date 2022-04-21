@@ -122,9 +122,7 @@ if busqueda in cdsID:
     promx = sumx/n
     promy = sumy/n
     
-    
         # sacando el pendiente de la recta (b)
-    
     
     m = (sumx*sumy - n * sumxy) / (sumx ** 2 - n*sumx2)
     
